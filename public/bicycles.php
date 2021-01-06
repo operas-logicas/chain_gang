@@ -48,6 +48,19 @@ $bikes = $parser->parse();
       <?php } ?>
 
     </table>
+
+<?php
+
+// Testing only
+$sql = "SELECT * FROM bicycles";
+$result = $db->query($sql);
+$row = $result->fetch_assoc();
+$result->free();
+
+echo "BRAND: " . $row['brand'];
+
+?>
+
   </div>
 
 </div>
