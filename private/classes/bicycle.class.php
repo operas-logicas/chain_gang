@@ -52,10 +52,33 @@ class Bicycle {
     return $object;
   }
 
+  public function create() {
+    $sql = "INSERT INTO bicycles (";
+    $sql .= "brand, model, year, category, color, gender, price, weight_kg, condition_id, description";
+    $sql .= ") VALUES (";
+    $sql .= "'" . $this->brand . "', ";
+    $sql .= "'" . $this->model . "', ";
+    $sql .= "'" . $this->year . "', ";
+    $sql .= "'" . $this->category . "', ";
+    $sql .= "'" . $this->color . "', ";
+    $sql .= "'" . $this->gender . "', ";
+    $sql .= "'" . $this->price . "', ";
+    $sql .= "'" . $this->weight_kg . "', ";
+    $sql .= "'" . $this->condition_id . "', ";
+    $sql .= "'" . $this->description . "'";
+    $sql .= ")";
+    $result = self::$db->query($sql);
+
+    if($result) {
+      $this->id = self::$db->insert_id;
+    }
+    return $result; // Returns true or false
+  }
+
   /* ------- END OF ACTIVE RECORD CODE -------- */
 
-  public const CATEGORIES = ['road', 'mountain', 'hybrid', 'cruiser', 'city', 'BMX'];
-  public const GENDERS = ['mens', 'womens', 'unixex'];
+  public const CATEGORIES = ['Road', 'Mountain', 'Hybrid', 'Cruiser', 'City', 'BMX'];
+  public const GENDERS = ['Mens', 'Womens', 'Unixex'];
 
   public static $conditions = [
     1 => 'Beat Up',
