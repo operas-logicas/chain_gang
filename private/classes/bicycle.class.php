@@ -57,7 +57,7 @@ class Bicycle {
   public const CATEGORIES = ['road', 'mountain', 'hybrid', 'cruiser', 'city', 'BMX'];
   public const GENDERS = ['mens', 'womens', 'unixex'];
 
-  protected static $conditions = [
+  public static $conditions = [
     1 => 'Beat Up',
     2 => 'Decent',
     3 => 'Good',
