@@ -41,5 +41,6 @@
 
   // Create database connection
   $db = db_connect();
+  Bicycle::set_database($db);
 
 ?>
