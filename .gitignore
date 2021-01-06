@@ -1,3 +1,4 @@
 .DS_Store
 *.sql
 .vscode/
+private/db_credentials.php
