@@ -30,11 +30,11 @@
   require_once('validation_functions.php');
   
   // Load class definitions manually
-  require_once('classes/bicycle.class.php');
   //require_once('classes/parsecsv.class.php');
+  require_once('classes/databaseobject.class.php');
+  require_once('classes/bicycle.class.php');
   
-
-  // Autoload additional class definitions
+  // Autoload additional class definitions if necessary
   function my_autoload($class) {
     if(preg_match('/\A\w+\Z/', $class)) {
       include_once('classes/' . $class . '.class.php');
@@ -44,6 +44,6 @@
 
   // Create database connection
   $db = db_connect();
-  Bicycle::set_database($db);
+  DatabaseObject::set_database($db);
 
 ?>

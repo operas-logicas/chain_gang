@@ -1,154 +1,9 @@
 <?php
 
-class Bicycle {
+class Bicycle extends DatabaseObject {
 
-  /* ------- START OF ACTIVE RECORD CODE -------- */
-
-  protected static $db;
-  protected static $db_columns = ['id', 'brand', 'model', 'year', 'category', 'color', 'gender', 'price', 'weight_kg', 'condition_id', 'description'];
-  public $errors = [];
-
-  public static function set_database($db) {
-    self::$db = $db;
-  }
-
-  public static function find_by_sql($sql) {
-    $result = self::$db->query($sql);
-    if(!$result) {
-      exit("Database query failed.");
-    }
-
-    // Put results into objects
-    $object_array = [];
-    while($record = $result->fetch_assoc()) {
-      $object_array[] = self::instantiate($record);
-    }
-    $result->free();
-
-    return $object_array;
-  }
-
-  public static function find_all() {
-    $sql = "SELECT * FROM bicycles";
-    return self::find_by_sql($sql);
-  }
-
-  public static function find_by_id($id) {
-    $sql = "SELECT * FROM bicycles ";
-    $sql .= "WHERE id='" . self::$db->escape_string($id) . "'";
-    $object_array = self::find_by_sql($sql);
-    if(!empty($object_array)) {
-      return array_shift($object_array);
-    } else {
-      return false;
-    }
-  }
-
-  public static function instantiate($record) {
-    $object = new self;
-    foreach($record as $property => $value) {
-      if(property_exists($object, $property)) {
-        $object->$property = $value;
-      }
-    }
-    return $object;
-  }
-
-  public function validate() {
-    $this->errors = [];
-
-    if(is_blank($this->brand)) {
-      $this->errors[] = "Brand cannot be blank.";
-    }
-
-    if(is_blank($this->model)) {
-      $this->errors[] = "Model cannot be blank.";
-    }
-    
-    return $this->errors;
-  }
-
-  protected function create() {
-    $this->validate();
-    if(!empty($this->errors)) { return false; }
-
-    $attributes = $this->sanitized_attributes();
-    $sql = "INSERT INTO bicycles (";
-    $sql .= join(', ', array_keys($attributes));
-    $sql .= ") VALUES ('";
-    $sql .= join("', '", array_values($attributes));
-    $sql .= "')";
-    $result = self::$db->query($sql);
-    if($result) {
-      $this->id = self::$db->insert_id;
-    }
-    return $result; // Returns true or false
-  }
-
-  protected function update() {
-    $this->validate();
-    if(!empty($this->errors)) { return false; }
-
-    $attributes = $this->sanitized_attributes();
-    $attribute_pairs = [];
-    foreach($attributes as $key => $value) {
-      $attribute_pairs[] = "{$key}='{$value}'";
-    }
-    $sql = "UPDATE bicycles SET ";
-    $sql .= join(', ', $attribute_pairs);
-    $sql .= " WHERE id='" . self::$db->escape_string($this->id) . "' ";
-    $sql .= "LIMIT 1";
-    $result = self::$db->query($sql);
-    return $result; // Returns true or false
-  }
-
-  public function save() {
-    // A new record will not have an id yet
-    if(isset($this->id)) {
-      return $this->update();
-    } else {
-      return $this->create();
-    }
-  }
-
-  public function merge_attributes($args) {
-    foreach($args as $key => $value) {
-      if(property_exists($this, $key) && !is_null($value)) {
-        $this->$key = $value;
-      }
-    }
-  }
-
-  // Get properties using db column names (excluding id)
-  public function attributes() {
-    $attributes = [];
-    foreach(self::$db_columns as $column) {
-      if($column == 'id') { continue; }
-      $attributes[$column] = $this->$column;
-    }
-    return $attributes;
-  }
-
-  protected function sanitized_attributes() {
-    $sanitized = [];
-    foreach($this->attributes() as $key => $value) {
-      $sanitized[$key] = self::$db->escape_string($value);
-    }
-    return $sanitized;
-  }
-
-  /* ------- END OF ACTIVE RECORD CODE -------- */
-
-  public const CATEGORIES = ['Road', 'Mountain', 'Hybrid', 'Cruiser', 'City', 'BMX'];
-  public const GENDERS = ['Mens', 'Womens', 'Unisex'];
-
-  public static $conditions = [
-    1 => 'Beat Up',
-    2 => 'Decent',
-    3 => 'Good',
-    4 => 'Great',
-    5 => 'Like New'
-  ];
+  protected static $table_name = 'bicycles';
+  protected static $columns = ['id', 'brand', 'model', 'year', 'category', 'color', 'gender', 'price', 'weight_kg', 'condition_id', 'description'];
 
   public $id;
   public $brand;
@@ -162,6 +17,17 @@ class Bicycle {
   public $weight_kg;
   public $condition_id;
 
+  public static $conditions = [
+    1 => 'Beat Up',
+    2 => 'Decent',
+    3 => 'Good',
+    4 => 'Great',
+    5 => 'Like New'
+  ];
+
+  public const CATEGORIES = ['Road', 'Mountain', 'Hybrid', 'Cruiser', 'City', 'BMX'];
+  public const GENDERS = ['Mens', 'Womens', 'Unisex'];
+
   public function __construct($args=[]) {
     $this->brand = $args['brand'] ?? '';
     $this->model = $args['model'] ?? '';
@@ -173,14 +39,6 @@ class Bicycle {
     $this->price = $args['price'] ?? 0.00;
     $this->weight_kg = $args['weight_kg'] ?? 0.00;
     $this->condition_id = $args['condition_id'] ?? 3;
-
-    // Caution: allows private/protected props to be set dynamically
-    // foreach($args as $k => $v) {
-    //   if(property_exists($this, $k)) {
-    //     $this->$k = $v;
-    //   }
-    // }
-
   }
 
   public function name() {
@@ -205,6 +63,20 @@ class Bicycle {
 
   public function condition() {
     return self::$conditions[$this->condition_id] ?? 'Unknown';
+  }
+
+  public function validate() {
+    $this->errors = [];
+
+    if(is_blank($this->brand)) {
+      $this->errors[] = "Brand cannot be blank.";
+    }
+
+    if(is_blank($this->model)) {
+      $this->errors[] = "Model cannot be blank.";
+    }
+
+    return $this->errors;
   }
 
 }
