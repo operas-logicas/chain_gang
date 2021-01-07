@@ -5,6 +5,7 @@ class Bicycle {
   /* ------- START OF ACTIVE RECORD CODE -------- */
 
   protected static $db;
+  protected static $db_columns = ['id', 'brand', 'model', 'year', 'category', 'color', 'gender', 'price', 'weight_kg', 'condition_id', 'description'];
 
   public static function set_database($db) {
     self::$db = $db;
@@ -52,33 +53,73 @@ class Bicycle {
     return $object;
   }
 
-  public function create() {
+  protected function create() {
+    $attributes = $this->sanitized_attributes();
     $sql = "INSERT INTO bicycles (";
-    $sql .= "brand, model, year, category, color, gender, price, weight_kg, condition_id, description";
-    $sql .= ") VALUES (";
-    $sql .= "'" . $this->brand . "', ";
-    $sql .= "'" . $this->model . "', ";
-    $sql .= "'" . $this->year . "', ";
-    $sql .= "'" . $this->category . "', ";
-    $sql .= "'" . $this->color . "', ";
-    $sql .= "'" . $this->gender . "', ";
-    $sql .= "'" . $this->price . "', ";
-    $sql .= "'" . $this->weight_kg . "', ";
-    $sql .= "'" . $this->condition_id . "', ";
-    $sql .= "'" . $this->description . "'";
-    $sql .= ")";
+    $sql .= join(', ', array_keys($attributes));
+    $sql .= ") VALUES ('";
+    $sql .= join("', '", array_values($attributes));
+    $sql .= "')";
     $result = self::$db->query($sql);
-
     if($result) {
       $this->id = self::$db->insert_id;
     }
     return $result; // Returns true or false
   }
 
+  protected function update() {
+    $attributes = $this->sanitized_attributes();
+    $attribute_pairs = [];
+    foreach($attributes as $key => $value) {
+      $attribute_pairs[] = "{$key}='{$value}'";
+    }
+    $sql = "UPDATE bicycles SET ";
+    $sql .= join(', ', $attribute_pairs);
+    $sql .= " WHERE id='" . self::$db->escape_string($this->id) . "' ";
+    $sql .= "LIMIT 1";
+    $result = self::$db->query($sql);
+    return $result; // Returns true or false
+  }
+
+  public function save() {
+    // A new record will not have an id yet
+    if(isset($this->id)) {
+      return $this->update();
+    } else {
+      return $this->create();
+    }
+  }
+
+  public function merge_attributes($args) {
+    foreach($args as $key => $value) {
+      if(property_exists($this, $key) && !is_null($value)) {
+        $this->$key = $value;
+      }
+    }
+  }
+
+  // Get properties using db column names (excluding id)
+  public function attributes() {
+    $attributes = [];
+    foreach(self::$db_columns as $column) {
+      if($column == 'id') { continue; }
+      $attributes[$column] = $this->$column;
+    }
+    return $attributes;
+  }
+
+  protected function sanitized_attributes() {
+    $sanitized = [];
+    foreach($this->attributes() as $key => $value) {
+      $sanitized[$key] = self::$db->escape_string($value);
+    }
+    return $sanitized;
+  }
+
   /* ------- END OF ACTIVE RECORD CODE -------- */
 
   public const CATEGORIES = ['Road', 'Mountain', 'Hybrid', 'Cruiser', 'City', 'BMX'];
-  public const GENDERS = ['Mens', 'Womens', 'Unixex'];
+  public const GENDERS = ['Mens', 'Womens', 'Unisex'];
 
   public static $conditions = [
     1 => 'Beat Up',
@@ -97,9 +138,8 @@ class Bicycle {
   public $description;
   public $gender;
   public $price;
-
-  protected $weight_kg;
-  protected $condition_id;
+  public $weight_kg;
+  public $condition_id;
 
   public function __construct($args=[]) {
     $this->brand = $args['brand'] ?? '';
@@ -109,7 +149,7 @@ class Bicycle {
     $this->color = $args['color'] ?? '';
     $this->description = $args['description'] ?? '';
     $this->gender = $args['gender'] ?? '';
-    $this->price = $args['price'] ?? '';
+    $this->price = $args['price'] ?? 0.00;
     $this->weight_kg = $args['weight_kg'] ?? 0.00;
     $this->condition_id = $args['condition_id'] ?? 3;
 

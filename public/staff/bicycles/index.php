@@ -41,7 +41,7 @@ $bicycles = Bicycle::find_all();
           <td><?php echo h($bicycle->category); ?></td>
           <td><?php echo h($bicycle->gender); ?></td>
           <td><?php echo h($bicycle->color); ?></td>
-          <td><?php echo '$' . h(number_format(floatval($bicycle->price), 2)); ?></td>
+          <td><?php echo '$' . h(number_format($bicycle->price, 2)); ?></td>
           <td><a class="action" href="<?php echo url_for('/staff/bicycles/show.php?id=' . h(u($bicycle->id))); ?>">View</a></td>
           <td><a class="action" href="<?php echo url_for('/staff/bicycles/edit.php?id=' . h(u($bicycle->id))); ?>">Edit</a></td>
           <td><a class="action" href="<?php echo url_for('/staff/bicycles/delete.php?id=' . h(u($bicycle->id))); ?>">Delete</a></td>
