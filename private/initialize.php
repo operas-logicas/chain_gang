@@ -1,8 +1,6 @@
 <?php
   ob_start(); // turn on output buffering
 
-  session_start(); // turn on sessions
-
   // Assign file paths to PHP constants
   // __FILE__ returns the current path to this file
   // dirname() returns the path to the parent directory
@@ -31,7 +29,9 @@
   
   // Load class definitions manually
   //require_once('classes/parsecsv.class.php');
+  require_once('classes/session.class.php');
   require_once('classes/databaseobject.class.php');
+  require_once('classes/admin.class.php');
   require_once('classes/bicycle.class.php');
   
   // Autoload additional class definitions if necessary
@@ -45,5 +45,8 @@
   // Create database connection
   $db = db_connect();
   DatabaseObject::set_database($db);
+
+  // Create session instance
+  $session = new Session;
 
 ?>

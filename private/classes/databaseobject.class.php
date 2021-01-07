@@ -54,6 +54,21 @@ class DatabaseObject {
     return $object;
   }
 
+  public function has_unique_field($key, $value) {
+    if(property_exists($this, $key) && !is_null($value)) {
+      $sql = "SELECT * FROM " . static::$table_name . " ";
+      $sql .= "WHERE " . self::$db->escape_string($key) . " ='";
+      $sql .= self::$db->escape_string($value). "' ";
+      $sql .= "AND id!='" . self::$db->escape_string($this->id) . "'";
+      $result = self::$db->query($sql);
+      $count = $result->num_rows;
+      $result->free();
+      return $count === 0;
+    } else {
+      return false;
+    }
+  }
+
   public function validate() {
     $this->errors = [];
 
@@ -136,7 +151,7 @@ class DatabaseObject {
   }
 
   public function delete() {
-    $sql = "DELETE FROM bicycles ";
+    $sql = "DELETE FROM " . static::$table_name . " ";
     $sql .= "WHERE id='" . self::$db->escape_string($this->id) . "' ";
     $sql .= "LIMIT 1";
     $result = self::$db->query($sql);

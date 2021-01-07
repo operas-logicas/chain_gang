@@ -98,9 +98,27 @@
   // For new records, provide only the username.
   // For existing records, provide current ID as second argument
   //   has_unique_username('johnqpublic', 4)
-  function has_unique_username($username, $current_id="0") {
-    // Need to re-write for OOP
-    // TODO
+  function has_unique_username($username, $current_id='0') {
+    $admin = Admin::find_by_username($username);
+    if($admin === false || $admin->id == $current_id) {
+      // is unique
+      return true;
+    } else {
+      // not unique
+      return false;
+    }
+  }
+
+  // is_valid_password('secretpassword')
+  // validate admin password contains at least
+  // 1 uppercase letter [A-Z], 1 lowercase letter [a-z],
+  // 1 number [0-9], 1 symbol [^A-Za-z0-9\s]
+  // uses preg_match
+  function is_valid_password($value) {
+    return ( preg_match('/[A-Z]+/', $value) === 1 && 
+             preg_match('/[a-z]+/', $value) === 1 && 
+             preg_match('/[0-9]+/', $value) === 1 && 
+             preg_match('/[^A-Za-z0-9\s]+/', $value) === 1 );
   }
 
 ?>

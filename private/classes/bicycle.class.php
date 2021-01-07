@@ -68,13 +68,28 @@ class Bicycle extends DatabaseObject {
   public function validate() {
     $this->errors = [];
 
+    // brand
     if(is_blank($this->brand)) {
       $this->errors[] = "Brand cannot be blank.";
+    } elseif(!has_length($this->brand, ['min' => 2, 'max' => 255])) {
+      $this->errors[] = "Brand must be between 2 and 255 characters.";
     }
 
+    // model
     if(is_blank($this->model)) {
       $this->errors[] = "Model cannot be blank.";
+    } elseif(!has_length($this->model, ['min' => 2, 'max' => 255])) {
+      $this->errors[] = "Model must be between 2 and 255 characters.";
     }
+
+    // year
+    if(is_blank($this->year)) {
+      $this->errors[] = "Year cannot be blank.";
+    } elseif(!((int) $this->year  >= 0) && !has_length_exactly($this->year, 4)) {
+      $this->errors[] = "Year must be 4 digits.";
+    }
+
+    // TODO additional custom validation
 
     return $this->errors;
   }

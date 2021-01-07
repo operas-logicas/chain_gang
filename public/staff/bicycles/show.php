@@ -1,5 +1,7 @@
 <?php require_once('../../../private/initialize.php'); ?>
 
+<?php require_login(); ?>
+
 <?php
 
 $id = $_GET['id'] ?? '1';
@@ -65,3 +67,5 @@ $bicycle = Bicycle::find_by_id($id);
   </div>
 
 </div>
+
+<?php include(SHARED_PATH . '/staff_footer.php'); ?>
