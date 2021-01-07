@@ -21,7 +21,6 @@
         <th>Category</th>
         <th>Gender</th>
         <th>Color</th>
-        <th>Condition</th>
         <th>Price</th>
         <th>&nbsp;</th>
       </tr>
@@ -39,8 +38,7 @@ $bikes = Bicycle::find_all();
           <td><?php echo h($bike->category); ?></td>
           <td><?php echo h($bike->gender); ?></td>
           <td><?php echo h($bike->color); ?></td>
-          <td><?php echo h($bike->condition()); ?></td>
-          <td><?php echo '$' . h(number_format(floatval($bike->price), 2)); ?></td>
+          <td>$<?php echo h(number_format(floatval($bike->price), 2)); ?></td>
           <td><a href="detail.php?id=<?php echo h(u($bike->id)); ?>">View</a></td>
         </tr>
       <?php } ?>
