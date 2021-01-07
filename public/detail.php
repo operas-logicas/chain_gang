@@ -57,7 +57,7 @@
       </dl>
       <dl>
         <dt>Price</dt>
-        <dd>$<?php echo h(number_format(floatval($bike->price), 2)); ?></dd>
+        <dd>$<?php echo h(number_format($bike->price, 2)); ?></dd>
       </dl>
       <dl>
         <dt>Description</dt>
