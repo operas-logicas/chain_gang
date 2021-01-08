@@ -32,6 +32,20 @@ class DatabaseObject {
     return self::find_by_sql($sql);
   }
 
+  public static function count_all() {
+    $sql = "SELECT COUNT(*) FROM " . static::$table_name;
+    $result = self::$db->query($sql);
+    $row = $result->fetch_array();
+    return array_shift($row);
+  }
+
+  public static function find_with_limit_offset($per_page=2, $offset=0) {
+    $sql = "SELECT * FROM " . static::$table_name . " ";
+    $sql .= "LIMIT " . self::$db->escape_string($per_page) . " ";
+    $sql .= "OFFSET " . self::$db->escape_string($offset);
+    return self::find_by_sql($sql);
+  }
+
   public static function find_by_id($id) {
     $sql = "SELECT * FROM " . static::$table_name . " ";
     $sql .= "WHERE id='" . self::$db->escape_string($id) . "'";
@@ -59,7 +73,7 @@ class DatabaseObject {
       $sql = "SELECT * FROM " . static::$table_name . " ";
       $sql .= "WHERE " . self::$db->escape_string($key) . " ='";
       $sql .= self::$db->escape_string($value). "' ";
-      $sql .= "AND id!='" . self::$db->escape_string($this->id) . "'";
+      $sql .= "AND id !='" . self::$db->escape_string($this->id) . "'";
       $result = self::$db->query($sql);
       $count = $result->num_rows;
       $result->free();
@@ -132,7 +146,6 @@ class DatabaseObject {
     }
   }
 
-  // Get properties using db column names (excluding id)
   public function attributes() {
     $attributes = [];
     foreach(static::$columns as $column) {

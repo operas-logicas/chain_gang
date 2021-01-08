@@ -16,7 +16,6 @@ if(is_post_request()) {
     redirect_to(url_for('/staff/bicycles/show.php?id=' . $new_id));
   } else {
     // show errors
-    // TODO
   }
 
 } else {

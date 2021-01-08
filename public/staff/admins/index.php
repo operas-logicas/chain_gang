@@ -3,9 +3,13 @@
 <?php require_login(); ?>
 
 <?php
+
+$current_page = $_GET['page'] ?? '1';
+$per_page = 5;
+$total_count = Admin::count_all();
   
-// Find all admins;
-$admins = Admin::find_all();
+$pagination = new Pagination($current_page, $per_page, $total_count);
+$admins = Admin::find_with_limit_offset($per_page, $pagination->offset());
   
 ?>
 <?php $page_title = 'Admins'; ?>
@@ -43,7 +47,14 @@ $admins = Admin::find_all();
           <td><a class="action" href="<?php echo url_for('/staff/admins/delete.php?id=' . h(u($admin->id))); ?>">Delete</a></td>
     	  </tr>
       <?php } ?>
-  	</table>
+    </table>
+    
+    <?php
+
+    $url = url_for('/staff/admins/index.php');
+    echo $pagination->page_links($url);
+
+    ?>
 
   </div>
 

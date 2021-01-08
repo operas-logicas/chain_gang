@@ -3,11 +3,28 @@
 <?php require_login(); ?>
 
 <?php
-  
-// Find all bicycles;
-$bicycles = Bicycle::find_all();
-  
+
+$current_page = $_GET['page'] ?? '1';
+$per_page = 5;
+$total_count = Bicycle::count_all();
+
+$pagination = new Pagination($current_page, $per_page, $total_count);
+
+// Find all bicycles
+// use pagination instead
+// $bicycles = Bicycle::find_all();
+
+// $sql = "SELECT * FROM bicycles ";
+// $sql .= "LIMIT {$per_page} ";
+// $sql .= "OFFSET {$pagination->offset()}";
+// $bicycles = Bicycle::find_by_sql($sql);
+
+// Wrapped above in method in DatabaseObject class
+// to be reusable by other classes
+$bicycles = Bicycle::find_with_limit_offset($per_page, $pagination->offset());
+
 ?>
+
 <?php $page_title = 'Bicycles'; ?>
 <?php include(SHARED_PATH . '/staff_header.php'); ?>
 
@@ -49,7 +66,14 @@ $bicycles = Bicycle::find_all();
           <td><a class="action" href="<?php echo url_for('/staff/bicycles/delete.php?id=' . h(u($bicycle->id))); ?>">Delete</a></td>
     	  </tr>
       <?php } ?>
-  	</table>
+    </table>
+    
+    <?php
+    
+    $url = url_for('/staff/bicycles/index.php');
+    echo $pagination->page_links($url);
+    
+    ?>
 
   </div>
 

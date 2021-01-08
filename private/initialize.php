@@ -30,6 +30,7 @@
   // Load class definitions manually
   //require_once('classes/parsecsv.class.php');
   require_once('classes/session.class.php');
+  require_once('classes/pagination.class.php');
   require_once('classes/databaseobject.class.php');
   require_once('classes/admin.class.php');
   require_once('classes/bicycle.class.php');
